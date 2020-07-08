@@ -90,7 +90,7 @@ int main(){
 				//Write pixel values to the file
 				my_Image << r << ' ' << g << ' ' << b << "\n";
 
-				if(xPixelCoord % 100 == 0 && yPixelCoord % 100 == 0){
+				if(xPixelCoord % 100 == 0 && yPixelCoord == pixelHeight - 1){
 					cout << "Evaluating Point X:" << xPixelCoord << " Y:" << yPixelCoord << "\r" << flush;
 				}
 			}
