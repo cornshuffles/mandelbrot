@@ -4,8 +4,9 @@
 #include <cmath> // round
 using namespace std;
 
-int height = 18000;
-int width = 24000;
+//Resolution of the image
+int pixelHeight = 18000;
+int pixelWidth = 24000;
 
 //Window vars
 long double minimumX = -2.25;
@@ -31,29 +32,36 @@ int main(){
 	if(my_Image.is_open ()) {
 
 		//image size data
-		my_Image << "P3\n" << height << " " << width << " 255\n";
+		my_Image << "P3\n" << pixelHeight << " " << pixelWidth << " 255\n";
 
 
 		//iterate over each pixel
-		for(int i = 0; i < width; i++){
-			for(int j = 0; j < height; j++){
+		for(int xPixelCoord = 0; xPixelCoord < pixelWidth; xPixelCoord++){
+			for(int yPixelCoord = 0; yPixelCoord < pixelHeight; yPixelCoord++){
+				
+				//Convert pixel coords to unreal plane coords (x,iy)
+				long double x = map(xPixelCoord, 0, pixelWidth, minimumX, maximumX);
+				long double y = map(yPixelCoord, 0, pixelHeight, minimumY, maximumY);
 
-				long double x = map(i, 0, width, minimumX, maximumX);
-				long double y = map(j, 0, height, minimumY, maximumY);
-
-				long double xi = x;
-				long double yi = y;
+				//Coords of point to evaluate
+				long double xCoord = x;
+				long double yCoord = y;
 
 				int loopCounter = 0;
 
-				//mandelbrot iteration
+				/*----------------------------------------------------------------------------------------------*
+				 * mandelbrot iteration --- Zn+1 = Zn^2 + C --- C is the point we are evaluating (a + bi)	*
+				 * If for all n, such that n < MAX_ITERATIONS, Zn < 2, C is in the mandelbrot set		*
+				 * Z0 = C = x + iy										*
+				 * Z1 = C^2 + C = (x + iy)^2 + C = x^2 + 2xyi - y^2 + C						*
+				 *----------------------------------------------------------------------------------------------*/
 				for(int i = 0; i < MAX_ITERATIONS; i++){
 
 					long double x1 = (x * x) - (y * y);
 					long double y1 = 2 * x * y;
 
-					x = x1 + xi;
-					y = y1 + yi;
+					x = x1 + xCoord;
+					y = y1 + yCoord;
 
 					if((x + y) > 2){
 						break;
@@ -79,13 +87,12 @@ int main(){
 				int g = brightness;
 				int b = map(sqrt(brightness), 0, sqrt(255), 0, 255);
 
-
+				//Write pixel values to the file
 				my_Image << r << ' ' << g << ' ' << b << "\n";
 
-				if(i % 100 == 0 && j % 1000 == 0){
-					cout << "X:" << i << " Y:" << j << "\n";
+				if(xPixelCoord % 100 == 0 && yPixelCoord % 100 == 0){
+					cout << "Evaluating Point X:" << xPixelCoord << " Y:" << yPixelCoord << "\r" << flush;
 				}
-
 			}
 		}
 
