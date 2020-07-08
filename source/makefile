@@ -1,6 +1,6 @@
 #Default target - creates executable named mandelbrot
 mandelbrot: mandelbrot.o
-	g++ mandelbrot.o -o mandelbrot
+	g++ mandelbrot.o -o mandelbrot -O3
 #mandelbrot target - maintains mandelbrot file	
 mandelbrot.o: mandelbrot.cpp
 	g++ -c mandelbrot.cpp
