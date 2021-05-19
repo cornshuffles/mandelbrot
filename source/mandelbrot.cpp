@@ -2,11 +2,19 @@
 #include <fstream> // for files manipulation
 #include <complex> // for complex numbers
 #include <cmath> // round
+#include <string>
+#include <pthread.h>
+
+#define NUMBER_THREADS 16
+
 using namespace std;
 
+// Function Prototype
+void *thread(void *arg);
+
 //Resolution of the image
-int pixelHeight = 18000;
-int pixelWidth = 24000;
+int pixelHeight = 1080;
+int pixelWidth = 1920;
 
 //Window vars
 long double minimumX = -2.25;
@@ -17,6 +25,8 @@ long double maximumY = 1.125;
 //auto calculate maxY to eliminate stretching
 //long double maximumY = minimumY + (maximumX - minimumX) * height / width;
 
+long double threadWidth = (maximumX - minimumX) / NUMBER_THREADS;
+int threadPixelWidth = pixelWidth / NUMBER_THREADS;
 
 int MAX_ITERATIONS = 5000;
 
@@ -28,19 +38,68 @@ long double map(long double value, long double inMin, long double inMax, long do
 int main(){
 
 	//open file
-	ofstream my_Image ("mandelbrot.ppm");
-	if(my_Image.is_open ()) {
+	ofstream fullImage ("mandelbrot.ppm");
+	if(fullImage.is_open ()) {
 
 		//image size data
-		my_Image << "P3\n" << pixelHeight << " " << pixelWidth << " 255\n";
+		fullImage << "P3\n" << pixelHeight << " " << pixelWidth << " 255\n";
 
+		// Create threads
+		pthread_t threadID[NUMBER_THREADS];
+		for(int i = 0; i < NUMBER_THREADS; i++){
+			long double *arg = new long double[3];
+			arg[0] = minimumX + (threadWidth * i);			// Xmin
+			arg[1] = minimumX + (threadWidth * (i + 1));	// Xmax
+			arg[2] = i;										// threadNumber
+			pthread_create(&threadID[i], NULL, thread, arg);
+		}
+
+		// Wait for threads to finish
+		for(int i = 0; i < NUMBER_THREADS; i++){
+			pthread_join(threadID[i], NULL);
+		}
+
+		// Combine images
+		for(int i = 0; i < NUMBER_THREADS; i++){
+			string fileName = "mandelbrot";
+			fileName.append(to_string(i));
+			ifstream partialImage(fileName);
+			fullImage << partialImage.rdbuf();
+			partialImage.close();
+			remove(fileName.c_str());
+		}
+
+		//close the ofstream
+		fullImage.close();
+		cout << "Finished!" << endl;
+	}
+	//handle not opening file
+	else{
+		cout << "Could not open the file";
+	}
+	return 0;
+}
+
+void *thread(void *arg){
+	// Read args
+	long double *argz = (long double*)arg;
+	long double threadMinimumX = argz[0];
+	long double threadMaximumX = argz[1];
+	long double threadNumber = argz[2];
+	int threadInt = (int)threadNumber;
+
+	//open file
+	string fileName = "mandelbrot";
+	fileName.append(to_string(threadInt));
+	ofstream my_Image (fileName);
+	if(my_Image.is_open ()) {
 
 		//iterate over each pixel
-		for(int xPixelCoord = 0; xPixelCoord < pixelWidth; xPixelCoord++){
+		for(int xPixelCoord = 0; xPixelCoord < threadPixelWidth; xPixelCoord++){
 			for(int yPixelCoord = 0; yPixelCoord < pixelHeight; yPixelCoord++){
 				
 				//Convert pixel coords to unreal plane coords (x,iy)
-				long double x = map(xPixelCoord, 0, pixelWidth, minimumX, maximumX);
+				long double x = map(xPixelCoord, 0, threadPixelWidth, threadMinimumX, threadMaximumX);
 				long double y = map(yPixelCoord, 0, pixelHeight, minimumY, maximumY);
 
 				//Coords of point to evaluate
@@ -89,20 +148,17 @@ int main(){
 
 				//Write pixel values to the file
 				my_Image << r << ' ' << g << ' ' << b << "\n";
-
-				if(xPixelCoord % 100 == 0 && yPixelCoord == pixelHeight - 1){
-					cout << "Evaluating Point X:" << xPixelCoord << " Y:" << yPixelCoord << "\r" << flush;
-				}
 			}
 		}
 
 	//close the ofstream
 	my_Image.close();
-	cout << "\nfinished\n";
+	cout << "Thread " << threadInt << " Finished!" << endl;
 	}
 	//handle not opening file
 	else{
 		cout << "Could not open the file";
+		return (void*)1;
 	}
-	return 0;
+	return (void*)0;
 }
