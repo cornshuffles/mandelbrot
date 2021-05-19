@@ -5,7 +5,7 @@
 #include <string>
 #include <pthread.h>
 
-#define NUMBER_THREADS 256
+#define NUMBER_THREADS 16
 
 using namespace std;
 
@@ -17,11 +17,11 @@ int pixelHeight = 1080;
 int pixelWidth = 1980;
 
 //Window vars
-long double minimumX = -2.25;
-long double maximumX = .75;
+long double minimumX = -1.65;
+long double maximumX = 1.85;
 
-long double minimumY = -1.125;
-long double maximumY = 1.125;
+long double minimumY = -1;
+long double maximumY = 1;
 //auto calculate maxY to eliminate stretching
 //long double maximumY = minimumY + (maximumX - minimumX) * height / width;
 
@@ -121,7 +121,7 @@ void *thread(void *arg){
 					x = x1 + cx;
 					y = y1 + cy;
 
-					if((x + y) > 2){
+					if((x + y) > 3){
 						break;
 					}
 
