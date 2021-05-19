@@ -38,9 +38,8 @@ long double map(long double value, long double inMin, long double inMax, long do
 int main(){
 
 	//open file
-	ofstream fullImage ("mandelbrot.ppm");
+	ofstream fullImage("mandelbrot.ppm");
 	if(fullImage.is_open ()) {
-
 		//image size data
 		fullImage << "P3\n" << pixelHeight << " " << pixelWidth << " 255\n";
 
@@ -91,9 +90,8 @@ void *thread(void *arg){
 	//open file
 	string fileName = "mandelbrot";
 	fileName.append(to_string(threadInt));
-	ofstream my_Image (fileName);
-	if(my_Image.is_open ()) {
-
+	ofstream my_Image(fileName);
+	if(my_Image.is_open ()){
 		//iterate over each pixel
 		for(int xPixelCoord = 0; xPixelCoord < threadPixelWidth; xPixelCoord++){
 			for(int yPixelCoord = 0; yPixelCoord < pixelHeight; yPixelCoord++){
