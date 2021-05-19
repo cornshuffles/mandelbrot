@@ -1,4 +1,9 @@
 #Default target - creates executable named mandelbrot
+
+# run and convert image to png
+img: mandelbrot
+	./mandelbrot
+
 mandelbrot: mandelbrot.o
 	g++ mandelbrot.o -o mandelbrot -O3
 #mandelbrot target - maintains mandelbrot file	
