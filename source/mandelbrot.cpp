@@ -13,8 +13,8 @@ using namespace std;
 void *thread(void *arg);
 
 //Resolution of the image
-int pixelHeight = 18000;
-int pixelWidth = 24000;
+int pixelHeight = 1080;
+int pixelWidth = 1980;
 
 //Window vars
 long double minimumX = -2.25;
@@ -29,6 +29,11 @@ long double threadWidth = (maximumX - minimumX) / NUMBER_THREADS;
 int threadPixelWidth = pixelWidth / NUMBER_THREADS;
 
 int MAX_ITERATIONS = 5000;
+
+// constant
+long double cx = -.4;
+long double cy = -.59;
+
 
 //maps given variable from one scale to another
 long double map(long double value, long double inMin, long double inMax, long double outMin, long double outMax){
@@ -100,10 +105,6 @@ void *thread(void *arg){
 				long double x = map(xPixelCoord, 0, threadPixelWidth, threadMinimumX, threadMaximumX);
 				long double y = map(yPixelCoord, 0, pixelHeight, minimumY, maximumY);
 
-				//Coords of point to evaluate
-				long double xCoord = x;
-				long double yCoord = y;
-
 				int loopCounter = 0;
 
 				/*----------------------------------------------------------------------------------------------*
@@ -117,8 +118,8 @@ void *thread(void *arg){
 					long double x1 = (x * x) - (y * y);
 					long double y1 = 2 * x * y;
 
-					x = x1 + xCoord;
-					y = y1 + yCoord;
+					x = x1 + cx;
+					y = y1 + cy;
 
 					if((x + y) > 2){
 						break;
