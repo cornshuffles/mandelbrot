@@ -5,7 +5,7 @@
 #include <string>
 #include <pthread.h>
 
-#define NUMBER_THREADS 16
+#define NUMBER_THREADS 256
 
 using namespace std;
 
@@ -13,8 +13,8 @@ using namespace std;
 void *thread(void *arg);
 
 //Resolution of the image
-int pixelHeight = 1080;
-int pixelWidth = 1920;
+int pixelHeight = 18000;
+int pixelWidth = 24000;
 
 //Window vars
 long double minimumX = -2.25;

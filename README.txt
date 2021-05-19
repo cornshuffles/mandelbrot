@@ -5,3 +5,5 @@ It takes no command line args. To edit drawing parameters, edit the values defin
 It outputs a file called mandelbrot.ppm.
 
 As is, the program will generate a 18000x24000 pixel image. Included is this image in .png format.
+
+This is the multi-threaded version. Literally trillions of times faster than single thread. Edit NUMBER_THREADS macro to accelerate as needed.
