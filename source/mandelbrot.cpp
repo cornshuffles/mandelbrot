@@ -114,9 +114,11 @@ void *thread(void *arg){
 				 * Z1 = C^2 + C = (x + iy)^2 + C = x^2 + 2xyi - y^2 + C						*
 				 *----------------------------------------------------------------------------------------------*/
 				for(int i = 0; i < MAX_ITERATIONS; i++){
+                    long double x1, y1;
 
-					long double x1 = (x * x) - (y * y);
-					long double y1 = 2 * x * y;
+                    // standard Zn+1 = Zn^2 + C
+					x1 = (x * x) - (y * y);
+					y1 = 2 * x * y;
 
 					x = x1 + cx;
 					y = y1 + cy;
@@ -124,6 +126,14 @@ void *thread(void *arg){
 					if((x + y) > 3){
 						break;
 					}
+
+                    /* Zn+1 = C * sin(Zn)
+                     * where sin(Zn) = xn + yn with 
+                     * xn+1 = sin(xn) * cosh(yn)
+                     * yn+1 = cos(xn) * sinh(yn)
+                    */
+
+                    /* Zn+1 = C * Zn * (1 - Zn)
 
 					loopCounter++;
 				}
