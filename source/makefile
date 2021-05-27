@@ -7,5 +7,5 @@ mandelbrot.o: mandelbrot.cpp
 	g++ -c mandelbrot.cpp
 #clean target -	removes all files ending in .o
 clean:
-	rm -i *.o -f
-	rm -i mandelbrot* -f
+	rm -i .o -f
+	ls | grep 'mandelbrot[0-9]\+' | xargs rm -i  -f
