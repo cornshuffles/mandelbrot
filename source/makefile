@@ -8,3 +8,4 @@ mandelbrot.o: mandelbrot.cpp
 #clean target -	removes all files ending in .o
 clean:
 	rm -i *.o -f
+	rm -i mandelbrot* -f
