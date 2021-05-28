@@ -5,28 +5,40 @@
 #include <string>
 #include <pthread.h>
 
-#define NUMBER_THREADS 256
+#define PI 3.14159265
 
 using namespace std;
 
 // Function Prototype
 void *thread(void *arg);
 
+//////////////////////////////////////////////////////////////////CHANGE ME
+// Number of threads
+const int NUMBER_THREADS = 240;
+
+// Centerpoint of the image
+long double centerPointX = -0.936;
+long double centerPointY = 0;
+
+// Length in the coordinate dimension X
+long double coordinateLengthX = 3.744;
+
 //Resolution of the image
-int pixelHeight = 18000;
-int pixelWidth = 24000;
+int pixelLengthX = 2160; // TO PREVENT BLACK BAR MAKE THIS DIVISIBLE BY NUMBER_THREADS
+int pixelLengthY = 3840;
+//////////////////////////////////////////////////////////////////
 
-//Window vars
-long double minimumX = -2.25;
-long double maximumX = .75;
-
-long double minimumY = -1.125;
-long double maximumY = 1.125;
-//auto calculate maxY to eliminate stretching
-//long double maximumY = minimumY + (maximumX - minimumX) * height / width;
+// Calculate window vars
+int pixelHeight = pixelLengthY;
+int pixelWidth = pixelLengthX;
+long double aspectRatio = (long double)pixelWidth/(long double)pixelHeight;
+long double minimumX = centerPointX - (coordinateLengthX / 2);
+long double maximumX = centerPointX + (coordinateLengthX / 2);
+long double minimumY =  centerPointY - ((coordinateLengthX / aspectRatio) / 2);
+long double maximumY =  centerPointY + ((coordinateLengthX / aspectRatio) / 2);
 
 long double threadWidth = (maximumX - minimumX) / NUMBER_THREADS;
-int threadPixelWidth = pixelWidth / NUMBER_THREADS;
+int threadPixelWidth = pixelLengthX / NUMBER_THREADS;
 
 int MAX_ITERATIONS = 5000;
 
@@ -41,7 +53,7 @@ int main(){
 	ofstream fullImage("mandelbrot.ppm");
 	if(fullImage.is_open ()) {
 		//image size data
-		fullImage << "P3\n" << pixelHeight << " " << pixelWidth << " 255\n";
+		fullImage << "P3\n"<< pixelHeight << " " << pixelWidth << " 255\n";
 
 		// Create threads
 		pthread_t threadID[NUMBER_THREADS];
@@ -131,18 +143,40 @@ void *thread(void *arg){
 				int brightness = map(loopCounter, 0, 200, 0, 255);
 
 				//remove wierd shadow
-				if(brightness < 20){
-					brightness = 0;
-				}
+				//if(brightness < 0){
+				//	brightness = 0;
+				//}
 
 				//mandelbrot set is black
 				if(loopCounter == MAX_ITERATIONS){
 					brightness = 0;
 				}
 
-				int r = map(brightness * brightness, 0, 255 * 255, 0, 255);
-				int g = brightness;
-				int b = map(sqrt(brightness), 0, sqrt(255), 0, 255);
+				int r, g, b = 0;
+				// blue og
+
+				/*
+				r = map(brightness * brightness, 0, 255 * 255, 0, 255);
+				g = brightness;
+				b = map(sqrt(brightness), 0, sqrt(255), 0, 255);
+				*/
+
+				// rainbow
+				if(loopCounter == MAX_ITERATIONS){
+					r = 0;
+					g = 0;
+					b = 0;
+				}
+				else if(brightness == 0){
+					r = 0;
+					g = 255;
+					b = 0;
+				}
+				else{
+					r = 255 * abs(cos(brightness));
+					g = 255 * abs(cos(brightness - PI / 3));
+					b = 255 * abs(cos(brightness - 2 * PI / 3));
+				}
 
 				//Write pixel values to the file
 				my_Image << r << ' ' << g << ' ' << b << "\n";
